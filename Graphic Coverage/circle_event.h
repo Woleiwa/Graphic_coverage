@@ -14,6 +14,8 @@ public:
 	Point get_center() const;
 	void disable();
 	bool is_able() const;
+	Site** get_sites() const;
+	Site* get_central_site() const;
 private:
 	Site *site_1, *site_2, *site_3;
 	Voronori_node* node;

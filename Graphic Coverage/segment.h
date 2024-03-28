@@ -15,7 +15,7 @@ public:
 	double get_intercept() const;
 	bool is_vertical() const;
 	~Segment();
-private:
+protected:
 	Point left = Point();
 	Point right = Point();
 };

@@ -3,6 +3,7 @@
 #define _EDGE_H_
 #include"segment.h"
 #include"vertice.h"
+#include"site.h"
 extern class Voronori_area;
 
 class Edge : public Segment
@@ -10,6 +11,8 @@ class Edge : public Segment
 public:
 	Edge(Vertice* left, Vertice* right, Voronori_area* left_area, Voronori_area* right_area, int index);
 	Edge(Voronori_area* left_area, Voronori_area* right_area, int index);
+	bool edge_of_site(Site* site1, Site* site2) const;
+	void set_vertice(Vertice* vertice);
 	int get_index() const;
 	Vertice* get_left() const;
 	Vertice* get_right() const;

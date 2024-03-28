@@ -39,6 +39,7 @@ private:
 	std::priority_queue<Event*> event_queue;
 	Voronori_node* root;
 	void clear_tree();
+	Voronori_node* seek_for_common_ancestor(Voronori_node* pre, Voronori_node* next);
 };
 
 Voronori::Voronori(double width, double length, double radius)

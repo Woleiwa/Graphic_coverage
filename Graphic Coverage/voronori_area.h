@@ -12,6 +12,8 @@ public:
 	void add_edge(Edge* edge);
 	Site* get_site() const;
 	std::vector<Edge*> get_edges() const;
+	Edge* seek_for_edge(Site* site) const;
+	bool is_area_of(Site* site) const;
 private:
 	Site* site;
 	std::vector<Edge*> edges;

@@ -115,3 +115,23 @@ Voronori_node* Voronori_node::get_next() const
 {
 	return this->next;
 }
+
+void Voronori_node::set_edge(Edge* edge)
+{
+	this->edge = edge;
+}
+
+Edge* Voronori_node::get_edge() const
+{
+	return this->edge;
+}
+
+void Voronori_node::set_left_site(Site* left_site)
+{
+	this->left_site = left_site;
+};
+
+void Voronori_node::set_right_site(Site* right_site)
+{
+	this->right_site = right_site;
+};

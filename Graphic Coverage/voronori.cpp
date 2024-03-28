@@ -1,5 +1,7 @@
 #include "voronori.h"
 #include "point_event.h"
+#include <map>
+#include <exception>
 
 void Voronori::add_site(Site site)
 {
@@ -106,6 +108,11 @@ void Voronori::handle_circle_event(Circle_event* c_event)
 	Voronori_node* node = c_event->get_node();
 	Voronori_node* pre = node->get_pre();
 	Voronori_node* next = node->get_next();
+	if (pre == nullptr || next == nullptr)
+	{
+		throw std::exception("The circle event has no pre node or next node");
+	}
+
 	if (pre != nullptr)
 	{
 		Circle_event* pre_event = (Circle_event*)pre->get_event();
@@ -124,9 +131,39 @@ void Voronori::handle_circle_event(Circle_event* c_event)
 		}
 		next->set_pre(pre);
 	}
+
+	Voronori_node* common_ancestor = seek_for_common_ancestor(pre, next);
+	if (common_ancestor == nullptr)
+	{
+		throw std::exception("No common ancestor!");
+	}
+	common_ancestor->set_left_site(pre->get_left_site());
+	common_ancestor->set_right_site(next->get_right_site());
+
 	Point center = c_event->get_center();
 	Vertice* vertice = new Vertice(center.get_x(), center.get_y(), std::vector<Edge*>(), this->vertice_list.size(), false);
 	this->vertice_list.push_back(vertice);
+	
+	Site** sites = c_event->get_sites();
+	Site* central = c_event->get_central_site();
+	int cur_index = 0;
+	Site** next_edge = new Site * [2];
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (sites[i] != central)
+		{
+			Edge* edge = this->voronori_area_list[central->get_index()]->seek_for_edge(sites[i]);
+			edge->set_vertice(vertice);
+			vertice->add_edge(edge);
+			next_edge[cur_index++] = sites[i];
+		}
+	}
+
+	Voronori_area* area_1 = this->voronori_area_list[next_edge[0]->get_index()];
+	Voronori_area* area_2 = this->voronori_area_list[next_edge[1]->get_index()];
+	Edge* edge = new Edge(area_1, area_2, this->edge_list.size());
+	this->edge_list.push_back(edge);
 
 	Voronori_node* parent = node->get_parent();
 	Voronori_node* grandparent = parent->get_parent();
@@ -168,6 +205,25 @@ void Voronori::handle_circle_event(Circle_event* c_event)
 	}
 };
 
+Voronori_node* Voronori::seek_for_common_ancestor(Voronori_node* pre, Voronori_node* next)
+{
+	Voronori_node* parent = pre->get_parent();
+	std::map<Voronori_node*, bool> seek_map = std::map<Voronori_node*, bool>();
+	
+	while (parent != nullptr)
+	{
+		seek_map.insert(std::make_pair(parent, true));
+		parent = parent->get_parent();
+	}
+
+	Voronori_node* target = next->get_parent();
+	while (seek_map.find(target) == seek_map.end())
+	{
+		target = target->get_parent();
+	}
+	return target;
+}
+
 void recursive_clear_tree(Voronori_node* root)
 {
 	if (root == nullptr)
@@ -206,7 +262,6 @@ bool Voronori::all_covered() const
 {
 	return true;
 };
-
 
 void Voronori::search_and_insert(Site* site)
 {
@@ -281,6 +336,14 @@ void Voronori::search_and_insert(Site* site)
 	left->set_left_child(left_of_left);
 	left->set_right_child(right_of_left);
 
+	Voronori_area* site_area = this->voronori_area_list[site->get_index()];
+	Voronori_area* arc_site_area = this->voronori_area_list[arc_site->get_index()];
+	Edge* edge = new Edge(site_area, arc_site_area, this->edge_list.size());
+	left->set_edge(edge);
+	right->set_edge(edge);
+	site_area->add_edge(edge);
+	arc_site_area->add_edge(edge);
+	this->edge_list.push_back(edge);
 
 	Voronori_node* left_neighbor = left_of_left;
 	Voronori_node* left_left_neighbor = left_of_left->get_pre();

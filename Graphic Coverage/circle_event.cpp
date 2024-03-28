@@ -29,3 +29,17 @@ Point Circle_event::get_center() const
 {
 	return this->central_point;
 }
+
+Site** Circle_event::get_sites() const
+{
+	Site** res = new Site * [3];
+	res[0] = this->site_1;
+	res[1] = this->site_2;
+	res[2] = this->site_3;
+	return res;
+}
+
+Site* Circle_event::get_central_site() const
+{
+	return this->node->get_right_site();
+}
